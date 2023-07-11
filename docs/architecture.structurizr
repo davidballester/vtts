@@ -1,0 +1,125 @@
+workspace {
+    model {
+        properties {
+            "structurizr.groupSeparator" "/"
+        }
+                
+        dm = person DM "A user who runs games."
+        player = person Player "A user who plays games."
+        softwareSystem = softwareSystem VTT {
+            dm -> this Uses
+            player -> this Uses
+            
+            group "VTT" {
+                vttGui = container "VTT GUI" "Allows users to play games" {
+                    tags gui
+                    dm -> this "Runs games"
+                    player -> this "Plays games"
+                }
+                vtts = container VTTs "Allows users to play games in a Virtual Table Top." {
+                    vttGui -> this "Reads and updates games"
+                }
+                vttsDatabase = container "VTTs Database" {
+                    tags database external
+                    vtts -> this "Reads/Writes" 
+                }
+                vttConnector = container "VTT Connector" "Allows players to connect to one another to play games." {
+                    tags subsystem
+                    vtts -> this "Connects users"
+                }
+            }
+            
+            group "Administrative" {
+                administrativeGui = container "Administrative GUI" "Allows users to access and manage games." {
+                    tags gui
+                    dm -> this "Creates and edits games, sends invitations, manage wikis, join games"
+                    player -> this "Views games, manage wikis, joins games"
+                }
+                
+                group "Wikis" {
+                    wikis = container Wikis "Allows users to manage a wikis associated to games." {
+                        administrativeGui -> this "Creates and manages wikis"
+                    }
+                    wikisDatabase = container "Wikis Database" {
+                        tags database external
+                        wikis -> this "Reads/Writes"
+                    }
+                }
+                
+                group "Games" {
+                    games = container Games "Allows users to manage games and send invitations to players." {
+                        administrativeGui -> this "Creates and manages games"
+                        wikis -> this "Checks users permissions"
+                        vtts -> this "Checks users permissions"
+                    }
+                    gamesDatabase = container "Games Database" {
+                        tags database external
+                        games -> this "Reads/Writes"
+                    }
+                }
+                
+                group "Users" {
+                    users = container Users "Manages users" {
+                        tags subsystem
+                        administrativeGui -> this "Register, read, update"
+                        games -> this "Associates games to users"
+                    }
+                    authentication = container Authentication "Provides and validates authentication." {
+                        tags subsystem
+                        administrativeGui -> this "Logs in"
+                        games -> this "Validates authentication"
+                        wikis -> this "Validates authentication"
+                        vtts -> this "Validates authentication"
+                    }
+                    authenticationProvider = container "Authentication Provider" "Handles authentication externally." {
+                        tags external
+                        authentication -> this Uses
+                    }
+                }
+                
+                group "Invitations" {
+                    invitations = container Invitations "Allows DMs to send invitations to games." {
+                        administrativeGui -> this "Send invitations"
+                    }
+                    invitationsDatabase = container "Invitations Database" {
+                        tags database external
+                        invitations -> this "Reads/Writes"
+                    }
+                    emailSystem = container "Email System" "Sends emails." {
+                        tags subsystem
+                        invitations -> this "Sends invitation emails"
+                    }
+                }
+            }
+        }
+    }
+
+    views {
+        systemContext softwareSystem {
+            include *
+            autoLayout
+        }
+        
+        container softwareSystem {
+            include *
+            autoLayout
+        }
+        
+        theme default
+        
+        styles {
+            element database {
+                shape cylinder
+            }
+            element gui {
+                shape webBrowser
+            }
+            element subsystem {
+                background #398CBF
+            }
+            element external {
+                background #cccccc
+            }
+        }
+    }
+}
