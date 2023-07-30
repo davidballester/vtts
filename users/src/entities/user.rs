@@ -8,11 +8,11 @@ lazy_static! {
         Regex::new(r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$").unwrap();
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct User {
-    id: Uuid,
-    name: String,
-    email: String,
+    pub id: Uuid,
+    pub name: String,
+    pub email: String,
 }
 
 impl User {
