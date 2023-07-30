@@ -46,7 +46,10 @@ pub struct DieselUsersRepository {
 
 impl UsersRepository for DieselUsersRepository {
     fn create(&self, user: User) -> Result<(), String> {
-        let db_user: DbUser = user.into();
+        let mut db_user: DbUser = user.into();
+        let now = chrono::Utc::now().naive_utc();
+        db_user.created_at = now.clone();
+        db_user.updated_at = now.clone();
         let mut conn = self.conn.lock().map_err(|err| err.to_string())?;
         diesel::insert_into(users::table)
             .values(&db_user)
@@ -77,7 +80,9 @@ impl UsersRepository for DieselUsersRepository {
 
     fn update(&self, user: User) -> Result<(), String> {
         let mut conn = self.conn.lock().map_err(|err| err.to_string())?;
-        let db_user: DbUser = user.into();
+        let mut db_user: DbUser = user.into();
+        let now = chrono::Utc::now().naive_utc();
+        db_user.updated_at = now.clone();
         diesel::update(users::table.find(db_user.id))
             .set(&db_user)
             .execute(&mut *conn)
