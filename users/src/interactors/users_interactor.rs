@@ -1,14 +1,19 @@
-use super::entities::user::User;
-use ports::users_repository::UsersRepository;
+use crate::entities::user::User;
+use crate::ports::users_repository::UsersRepository;
 use shared::ports::logger::Logger;
+use uuid::Uuid;
 
-pub struct UsersInteractors {
-    repository: Box<dyn UsersRepository>,
-    logger: Box<dyn Logger>,
+#[derive(Clone)]
+pub struct UsersInteractor {
+    repository: Box<dyn UsersRepository + Send + Sync>,
+    logger: Box<dyn Logger + Send + Sync>,
 }
 
 impl UsersInteractor {
-    pub fn new(repository: Box<dyn UsersRepository>, logger: Box<dyn Logger>) -> Self {
+    pub fn new(
+        repository: Box<dyn UsersRepository + Send + Sync>,
+        logger: Box<dyn Logger + Send + Sync>,
+    ) -> Self {
         UsersInteractor { repository, logger }
     }
 
@@ -25,7 +30,15 @@ impl UsersInteractor {
             "UsersInteractor.read".to_owned(),
             format!("Reading user: {}", id),
         );
-        self.repository.read_by_id(id)
+        self.repository.read(id)
+    }
+
+    pub fn read_by_email(&self, email: String) -> Result<Option<User>, String> {
+        self.logger.debug(
+            "UsersInteractor.read_by_email".to_owned(),
+            format!("Reading user by email: {}", email),
+        );
+        self.repository.read_by_email(email)
     }
 
     pub fn update(&self, user: User) -> Result<(), String> {
@@ -41,6 +54,6 @@ impl UsersInteractor {
             "UsersInteractor.delete".to_owned(),
             format!("Deleting user: {}", id),
         );
-        self.repository.delete_by_id(id)
+        self.repository.delete(id)
     }
 }

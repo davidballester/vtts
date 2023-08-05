@@ -4,6 +4,7 @@ use log::error;
 use log::info;
 use log::warn;
 
+#[derive(Clone)]
 pub struct EnvLogger {}
 
 impl Logger for EnvLogger {
@@ -21,6 +22,10 @@ impl Logger for EnvLogger {
 
     fn warning(&self, initiator: String, message: String) {
         warn!("{}: {}", initiator, message);
+    }
+
+    fn clone_box(&self) -> Box<dyn Logger + Send + Sync> {
+        Box::new((*self).clone())
     }
 }
 

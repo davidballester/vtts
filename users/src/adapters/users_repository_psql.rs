@@ -40,6 +40,7 @@ impl From<User> for DbUser {
     }
 }
 
+#[derive(Clone)]
 pub struct DieselUsersRepository {
     pub conn: Arc<Mutex<PooledConnection<ConnectionManager<diesel::PgConnection>>>>,
 }
@@ -96,6 +97,10 @@ impl UsersRepository for DieselUsersRepository {
             .execute(&mut *conn)
             .map_err(|err| err.to_string())?;
         Ok(())
+    }
+
+    fn clone_box(&self) -> Box<dyn UsersRepository + Send + Sync> {
+        Box::new((*self).clone())
     }
 }
 
