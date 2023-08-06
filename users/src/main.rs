@@ -42,10 +42,10 @@ async fn main() {
     let context = get_juniper_context();
     let context = warp::any().map(move || context.clone()).boxed();
     let graphql_filter = make_graphql_filter(schema, context);
-    println!("Listening on 127.0.0.1:8080");
+    println!("Listening on 127.0.0.1:80");
 
     warp::serve(warp::path("graphql").and(warp::post()).and(graphql_filter))
-        .run(([127, 0, 0, 1], 8080))
+        .run(([127, 0, 0, 1], 80))
         .await;
 }
 
