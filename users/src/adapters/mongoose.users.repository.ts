@@ -1,6 +1,6 @@
 import mongoose, { Document, model } from 'mongoose';
 import { Email } from 'src/entities/emails';
-import { Identity } from 'src/entities/identity';
+import { Identity } from 'src/entities/identities';
 import { NotValidatedUser, User, validateUser } from 'src/entities/users';
 import {
   DeleteUserError,

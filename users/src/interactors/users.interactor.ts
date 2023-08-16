@@ -1,10 +1,10 @@
 import { validateEmail } from 'src/entities/emails';
-import { validateIdentity } from 'src/entities/identity';
+import { validateIdentity } from 'src/entities/identities';
 import {
   NotValidatedUserThumbnail,
   UserThumbnail,
   validateUserThumbnail,
-} from 'src/entities/user.thumbnail';
+} from 'src/entities/users.thumbnails';
 import { NotValidatedUser, User, validateUser } from 'src/entities/users';
 import { UsersRepository } from 'src/ports/users.repository';
 

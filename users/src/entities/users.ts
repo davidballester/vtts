@@ -1,5 +1,5 @@
 import { Email, validateEmail } from './emails';
-import { Identity, validateIdentity } from './identity';
+import { Identity, validateIdentity } from './identities';
 import { Username, validateUsername } from './usernames';
 
 export interface User {

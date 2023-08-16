@@ -1,5 +1,5 @@
 import { Email } from 'src/entities/emails';
-import { Identity } from 'src/entities/identity';
+import { Identity } from 'src/entities/identities';
 import { User } from 'src/entities/users';
 
 export interface UsersRepository {
