@@ -8,6 +8,15 @@ import {
 import { NotValidatedUser, User, validateUser } from 'src/entities/users';
 import { UsersRepository } from 'src/ports/users.repository';
 
+export interface UserInput {
+  identities: Array<{
+    system: string;
+    id: string;
+  }>;
+  username: string;
+  email: string;
+}
+
 export class UsersInteractor {
   private repository: UsersRepository;
   private logger: Logger;
@@ -24,19 +33,22 @@ export class UsersInteractor {
     this.logger.setPrefix('UsersInteractor');
   }
 
-  async create(user: NotValidatedUser): Promise<User> {
+  async create(userInput: UserInput): Promise<User> {
     try {
+      const user: NotValidatedUser = {
+        ...userInput,
+        createdAt: new Date(),
+      };
       validateUser(user);
       const existingUser = await this.repository.readByEmail(user.email);
       if (existingUser) {
         throw new EmailAlreadyInUseError();
       }
-      user.createdAt = new Date();
       const savedUser = await this.repository.create(user);
       this.logger.info('create', savedUser);
       return savedUser;
     } catch (error) {
-      this.logger.error('create', user, typeof error, error.message);
+      this.logger.error('create', userInput, typeof error, error.message);
       throw error;
     }
   }
@@ -94,19 +106,23 @@ export class UsersInteractor {
     }
   }
 
-  async update(user: User, updatedUser: NotValidatedUser): Promise<User> {
+  async update(user: User, userInput: UserInput): Promise<User> {
     try {
-      validateUser(updatedUser);
-      if (user.email !== updatedUser.email) {
+      if (user.email !== userInput.email) {
         throw new UnauthorizedError();
       }
+      const updatedUser = {
+        ...user,
+        ...userInput,
+      };
+      validateUser(updatedUser);
       this.logger.info('update', user.email, updatedUser);
       return await this.repository.update(updatedUser);
     } catch (error) {
       this.logger.error(
         'update',
         user.email,
-        updatedUser,
+        userInput,
         error.message || typeof error,
       );
       throw error;

@@ -27,9 +27,6 @@ class UserInput {
 
   @Field()
   email: string;
-
-  @Field()
-  createdAt: Date;
 }
 
 @InputType()
@@ -53,7 +50,7 @@ export class UsersResolver {
     return this.userToUserGraphQl(user);
   }
 
-  @Query(() => UserGraphQl)
+  @Query(() => UserGraphQl, { nullable: true })
   async readByIdentity(
     @Args('system') system: string,
     @Args('id') id: string,
@@ -62,7 +59,7 @@ export class UsersResolver {
     return user ? this.userToUserGraphQl(user) : undefined;
   }
 
-  @Query(() => UserThumbnailGraphQl)
+  @Query(() => UserThumbnailGraphQl, { nullable: true })
   async readByEmail(
     @Context() { user }: UsersResolverContext,
     @Args('email') email: string,
