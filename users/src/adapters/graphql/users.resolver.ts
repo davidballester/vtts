@@ -50,27 +50,16 @@ export class UsersResolver {
     return this.userToUserGraphQl(user);
   }
 
-  @Query(() => UserGraphQl, { nullable: true })
-  async readByIdentity(
+  @Query(() => UserThumbnailGraphQl, { nullable: true })
+  async readUserThumbnailByIdentity(
     @Args('system') system: string,
     @Args('id') id: string,
-  ): Promise<UserGraphQl | undefined> {
-    const user = await this.interactor.readByIdentity({ system, id });
-    return user ? this.userToUserGraphQl(user) : undefined;
-  }
-
-  @Query(() => UserThumbnailGraphQl, { nullable: true })
-  async readByEmail(
-    @Context() { user }: UsersResolverContext,
-    @Args('email') email: string,
   ): Promise<UserThumbnailGraphQl | undefined> {
-    const userThumbnail = await this.interactor.readThumbnailByEmail(
-      user,
-      email,
-    );
-    return userThumbnail
-      ? this.userThumbnailToUserThumbnailGraphQl(userThumbnail)
-      : undefined;
+    const user = await this.interactor.readUserThumbnailByIdentity({
+      system,
+      id,
+    });
+    return user ? this.userThumbnailToUserThumbnailGraphQl(user) : undefined;
   }
 
   @Mutation(() => UserGraphQl)
@@ -103,7 +92,6 @@ export class UsersResolver {
     userThumbnail: UserThumbnail,
   ): UserThumbnailGraphQl {
     return {
-      email: userThumbnail.email,
       username: userThumbnail.username,
     };
   }

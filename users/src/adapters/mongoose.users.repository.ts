@@ -20,6 +20,8 @@ const UserSchema = new mongoose.Schema({
   email: String,
   createdAt: Date,
 });
+UserSchema.index({ email: 1 });
+UserSchema.index({ 'identities.system': 1, 'identities.id': 1 });
 
 interface UserModelInterface extends NotValidatedUser, Document {}
 
@@ -39,7 +41,10 @@ export class MongooseUsersRepository implements UsersRepository {
 
   async readByIdentity(identity: Identity): Promise<User | undefined> {
     try {
-      const user = await UserModel.findOne({ identity }).exec();
+      const user = await UserModel.findOne({
+        'identities.system': identity.system,
+        'identities.id': identity.id,
+      }).exec();
       if (!user) {
         return undefined;
       }

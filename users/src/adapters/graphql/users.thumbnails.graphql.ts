@@ -4,7 +4,4 @@ import { Field, ObjectType } from '@nestjs/graphql';
 export class UserThumbnailGraphQl {
   @Field()
   username: string;
-
-  @Field()
-  email: string;
 }

@@ -1,4 +1,3 @@
-import { validateEmail } from 'src/entities/emails';
 import { validateIdentity } from 'src/entities/identities';
 import {
   NotValidatedUserThumbnail,
@@ -7,6 +6,7 @@ import {
 } from 'src/entities/users.thumbnails';
 import { NotValidatedUser, User, validateUser } from 'src/entities/users';
 import { UsersRepository } from 'src/ports/users.repository';
+import { v4 as uuidv4 } from 'uuid';
 
 export interface UserInput {
   identities: Array<{
@@ -38,6 +38,13 @@ export class UsersInteractor {
       const user: NotValidatedUser = {
         ...userInput,
         createdAt: new Date(),
+        identities: [
+          ...(userInput.identities ?? []),
+          {
+            system: process.env.VTT_SYSTEM || 'vtt',
+            id: uuidv4(),
+          },
+        ],
       };
       validateUser(user);
       const existingUser = await this.repository.readByEmail(user.email);
@@ -53,53 +60,25 @@ export class UsersInteractor {
     }
   }
 
-  async readByIdentity(identity: {
+  async readUserThumbnailByIdentity(identity: {
     system: string;
     id: string;
-  }): Promise<User | undefined> {
+  }): Promise<UserThumbnail | undefined> {
     try {
       validateIdentity(identity);
       const user = await this.repository.readByIdentity(identity);
-      return user;
-    } catch (error) {
-      this.logger.error(
-        'readByIdentity',
-        identity,
-        error.message || typeof error,
-      );
-      throw error;
-    }
-  }
-
-  async readThumbnailByEmail(
-    user: User,
-    email: string,
-  ): Promise<UserThumbnail | undefined> {
-    try {
-      validateEmail(email);
-      const userFromDatabase = await this.repository.readByEmail(email);
-      this.logger.info(
-        'readThumbnailByEmail',
-        user.email,
-        'reads',
-        email,
-        'gets',
-        userFromDatabase,
-      );
-      if (!userFromDatabase) {
+      if (!user) {
         return undefined;
       }
       const userThumbnail: NotValidatedUserThumbnail = {
-        email: userFromDatabase?.email,
-        username: userFromDatabase?.username,
+        username: user.username,
       };
       validateUserThumbnail(userThumbnail);
       return userThumbnail;
     } catch (error) {
       this.logger.error(
-        'readThumbnailByEmail',
-        user.email,
-        email,
+        'readThumbnailByIdentity',
+        identity,
         error.message || typeof error,
       );
       throw error;
@@ -114,6 +93,7 @@ export class UsersInteractor {
       const updatedUser = {
         ...user,
         ...userInput,
+        identities: user.identities,
       };
       validateUser(updatedUser);
       this.logger.info('update', user.email, updatedUser);
