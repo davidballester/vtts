@@ -44,17 +44,6 @@ spec:
           timeoutSeconds: 30
           successThreshold: 1
           failureThreshold: 2
-        env:
-        - name: MONGO_INITDB_ROOT_USERNAME
-          valueFrom:
-            secretKeyRef:
-              name: {{ .Chart.Name }}-creds
-              key: username
-        - name: MONGO_INITDB_ROOT_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: {{ .Chart.Name }}-creds
-              key: password
         volumeMounts:
         - name: "{{ .Chart.Name }}-data-dir"
           mountPath: "/data/db"
