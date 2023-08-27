@@ -28,6 +28,10 @@ export class AppModule {
   constructor() {
     mongoose.connect(
       process.env.MONGO_CONNECTION || 'mongodb://127.0.0.1:27017/users',
+      {
+        user: process.env.MONGO_USER,
+        pass: process.env.MONGO_PASS,
+      },
     );
   }
 }
