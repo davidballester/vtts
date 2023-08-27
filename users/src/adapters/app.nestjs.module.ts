@@ -7,7 +7,7 @@ import { MongooseUsersRepository } from './mongoose.users.repository';
 import { ConsoleLogger } from './console.logger';
 import { User, validateUser } from 'src/entities/users';
 import mongoose from 'mongoose';
-import 'dotenv/config';
+import 'dotenv-defaults/config';
 
 @Module({
   imports: [
