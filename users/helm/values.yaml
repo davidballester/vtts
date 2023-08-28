@@ -1,0 +1,2 @@
+dockerImage: europe-west1-docker.pkg.dev/galvanic-smoke-396218/vtts/users
+dockerImageTag: latest
